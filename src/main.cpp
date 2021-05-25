@@ -1,5 +1,5 @@
+#include <ESP8266WiFi.h>
 #include <Arduino.h>
-#include <WiFi.h>
 #include <fstream>
 #include <iostream>
 
@@ -7,34 +7,26 @@
 
 
 /*---------------------Mapeamento de Hardware----------------------*/
-#define led1 2
+#define led1 1
 #define led2 33
 
 
 /*---------------------Constantes de Projeto ----------------------*/
-static char * ssid = "tira_o_zoio";
-static const char * password = "jabuticaba";
+const char * ssid     = "tira_o_zoio";
+const char * password = "jabuticaba";
 
 /*---------------------Variáveis GLobais    ----------------------*/
-static bool led1_status = false;
-static bool led2_status = false;
+bool led1_status = false;
+bool led2_status = false;
 
-static String header;
-
-
-// Current time
-static unsigned long currentTime = millis();
-// Previous time
-static unsigned long previousTime = 0; 
-// Define timeout time in milliseconds (example: 2000ms = 2s)
-static const long timeoutTime = 2000;
+String header;
 
 /*---------------------Objetos-------------------------------------*/
-static WiFiServer server(80);
+WiFiServer server(80);
 
 
 /*---------------------Declaração das Funções----------------------*/
-static void serverWifi();
+void serverWifi();
 
 
 
@@ -42,8 +34,8 @@ void setup() {
   Serial.begin(115200);           //inicializa Serial em 115200 baud rate
   pinMode(led1, OUTPUT);          //configura saída para relé 1
   digitalWrite(led1,LOW);         //inicializa desligado
-  //pinMode(led2, OUTPUT);          //configura saída para relé 2
- // digitalWrite(led2,LOW);         //inicializa desligado
+  pinMode(led2, OUTPUT);          //configura saída para relé 2
+  digitalWrite(led2,LOW);         //inicializa desligado
 
   Serial.print("Conectando-se a ");      //
   Serial.println(ssid);                  //
@@ -74,7 +66,7 @@ void loop() {
   serverWifi();                          //se estiver conectado iniciamos a função Server
 }
 
-static void serverWifi()
+void serverWifi()
 {
   WiFiClient client = server.available(); 
   if (client) {                            
@@ -95,7 +87,7 @@ static void serverWifi()
           if(header.indexOf("GET /led1") >= 0)
           {
             led1_status= !led1_status;
-            digitalWrite(led1,led1_status);
+            digitalWrite(led1,!led1_status);
             Serial.print("Recebeu Get L1: ");
             Serial.println(led1_status);
           }
@@ -103,7 +95,7 @@ static void serverWifi()
           if(header.indexOf("GET /led2") >= 0)
           {
             led2_status= !led2_status;
-            digitalWrite(led2,led2_status);
+            digitalWrite(led2,!led2_status);
           }
             Serial.println("Imprimindo pagina HTML");
             client.println("<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"icon\" href=\"data:,\"></head>");
